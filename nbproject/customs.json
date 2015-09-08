@@ -1,0 +1,14 @@
+{
+    "elements": {
+        "loginform": {},
+        "login-form": {},
+        "indy-signup-form": {},
+        "indy-login-form": {},
+        "configform": {}
+    },
+    "attributes": {
+        "aria-expanded": {
+            "context": "button"
+        }
+    }
+}

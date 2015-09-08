@@ -1,0 +1,27 @@
+<form name="indySignupForm" class="form-horizontal">
+    <div class="control-group form-group" ng-class="{error: indySignupForm.username.$invalid && !indySignupForm.username.$pristine}">
+        <label>Username</label>
+        <input type="text" name="username" ng-model="indySignup.username" required />
+        <span ng-show="indySignupForm.username.$error.required && !indySignupForm.username.$pristine" class="help-inline">
+        Required </span>
+    </div>
+    
+    <div class="control-group form-group" ng-class="{error: indySignupForm.password.$invalid && !indySignupForm.password.$pristine}" data-ng-class="{'ng-invalid':indySignupForm.passwordConfirm.$error.match}">
+        <label>Password</label>
+        <input type="password" name="password" ng-model="indySignup.password" required />
+        <span ng-show="indySignupForm.password.$error.required && !indySignupForm.password.$pristine" class="help-inline">
+        Required </span>
+        <span data-ng-show="!indySignupForm.password.$pristine && !indySignupForm.passwordConfirm.$pristine && indySignupForm.passwordConfirm.$error.match">Passwords do not match!</span>
+    </div>
+    
+    <div class="control-group form-group" ng-class="{error: indySignupForm.passwordConfirm.$invalid && !indySignupForm.passwordConfirm.$pristine}">
+        <label>Re-enter Password</label>
+        <input type="password" name="passwordConfirm" ng-model="indySignup.passwordConfirm" data-match="indySignup.password" required />
+        <span ng-show="indySignupForm.passwordConfirm.$error.required && !indySignupForm.passwordConfirm.$pristine" class="help-inline">
+        Required</span>
+        <span data-ng-show="!indySignupForm.password.$pristine && !indySignupForm.passwordConfirm.$pristine && indySignupForm.passwordConfirm.$error.match">Passwords do not match!</span>
+    </div>
+    
+      <button ng-click="indySignup.doSignup()" ng-disabled="indySignupForm.$invalid"
+          class="btn btn-primary">Sign up</button>
+</form>

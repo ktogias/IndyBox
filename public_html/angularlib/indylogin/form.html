@@ -1,0 +1,18 @@
+<form name="indyLoginForm" class="form-horizontal">
+    <div class="control-group form-group" ng-class="{error: indyLoginForm.username.$invalid && !indyLoginForm.username.$pristine}">
+        <label>Username</label>
+        <input type="text" name="username" ng-model="indyLogin.username" required />
+        <span ng-show="indyLoginForm.username.$error.required && !indyLoginForm.username.$pristine" class="help-inline">
+        Required</span>
+    </div>
+    
+    <div class="control-group form-group" ng-class="{error: indyLoginForm.password.$invalid && !indyLoginForm.password.$pristine}">
+        <label>Password</label>
+        <input type="password" name="password" ng-model="indyLogin.password" required />
+        <span ng-show="indyLoginForm.password.$error.required && !indyLoginForm.password.$pristine" class="help-inline">
+        Required</span>
+    </div>
+    
+      <button ng-click="indyLogin.doLogin()" ng-disabled="indyLoginForm.$invalid"
+          class="btn btn-primary">Login</button>
+</form>
