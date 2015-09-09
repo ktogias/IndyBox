@@ -11,12 +11,13 @@ function Indynet() {
 
     this.buildIndyUrl = function(url){
         if (typeof development_override.indynet.serverAppBaseUrl !== 'undefined'){
-            return url.replace(/\/[^\/]+\//, function(match){
+            return development_override.indynet.serverAppBaseUrl +
+                url.replace(/[^\/]+\//, function(match){
                     return match.replace(".","/");
-                }).replace("indy://", development_override.indynet.serverAppBaseUrl);
+                });
         }
         else {
-            return "/"+url;
+            return this.config.getIndynetBaseUrl()+url;
         }
     };
 

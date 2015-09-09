@@ -7,7 +7,7 @@ var indyLoginModule = angular.module('indyLogin', [])
     return {
         restrict: 'E',
         scope: {},
-        templateUrl: indynet.buildIndyUrl('indy://angularlib.indylogin/form.html'),
+        templateUrl: indynet.buildIndyUrl('angularlib.indylogin/form.html'),
         replace: true,
         controllerAs:'indyLogin',
         controller: function() {

@@ -1,17 +1,19 @@
 <form name="indySignupForm" class="form-horizontal">
     <div class="control-group form-group" ng-class="{error: indySignupForm.username.$invalid && !indySignupForm.username.$pristine}">
         <label>Username</label>
-        <input type="text" name="username" ng-model="indySignup.username" required />
+        <input type="text" name="username" ng-model="indySignup.username" required ng-minlength="4"/>
         <span ng-show="indySignupForm.username.$error.required && !indySignupForm.username.$pristine" class="help-inline">
         Required </span>
+        <span data-ng-show="!indySignupForm.username.$pristine && indySignupForm.username.$error.minlength">Username too short! Must contain at least 4 characters</span>
     </div>
     
     <div class="control-group form-group" ng-class="{error: indySignupForm.password.$invalid && !indySignupForm.password.$pristine}" data-ng-class="{'ng-invalid':indySignupForm.passwordConfirm.$error.match}">
         <label>Password</label>
-        <input type="password" name="password" ng-model="indySignup.password" required />
+        <input type="password" name="password" ng-model="indySignup.password" required ng-minlength="8" />
         <span ng-show="indySignupForm.password.$error.required && !indySignupForm.password.$pristine" class="help-inline">
         Required </span>
         <span data-ng-show="!indySignupForm.password.$pristine && !indySignupForm.passwordConfirm.$pristine && indySignupForm.passwordConfirm.$error.match">Passwords do not match!</span>
+        <span data-ng-show="!indySignupForm.password.$pristine && indySignupForm.password.$error.minlength">Password too short! Must contain at least 8 characters</span>
     </div>
     
     <div class="control-group form-group" ng-class="{error: indySignupForm.passwordConfirm.$invalid && !indySignupForm.passwordConfirm.$pristine}">

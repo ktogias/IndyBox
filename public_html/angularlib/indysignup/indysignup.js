@@ -1,4 +1,4 @@
-/* global angular, indynet */
+/* global angular, indynet, Indynet */
 if (typeof indynet === 'undefined'){
     throw new Exception('Indynet object is not initialized!');
 }
@@ -8,12 +8,14 @@ var indySignupModule = angular.module('indySignup', ['validation.match'])
     return {
         restrict: 'E',
         scope: {},
-        templateUrl: indynet.buildIndyUrl('indy://angularlib.indysignup/form.html'),
+        templateUrl: indynet.buildIndyUrl('angularlib.indysignup/form.html'),
         replace: true,
         controllerAs:'indySignup',
         controller: function() {
             var indySignup = this;
             indySignup.doSignup = function(){
+                console.log(this.password);
+                console.log(zxcvbn(this.password));
                 var signup = new Indynet.Signup("lala.koko");
                 var usernameHash = null;
                 var passwordHash = null;
