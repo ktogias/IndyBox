@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+	
+      <script type="text/javascript">
+	  var globalStartTime = null;
+	  var globalEndTime = null;
+          var fileObjects = {};
+          var InsertFile = function(ws, oid, file, insertKey){
+            this.ws = ws;
+            this.oid = oid;
+            this.file = file;
+            this.insertKey = insertKey;
+	    this.startTime;
+	    this.endTime;
+            
+            this.sendMetadata = function(){
+                var insertObject = {
+                    mid:this.oid+"-sm",
+                    action: "insert",
+                    contentType: this.file.type,
+                    filename: "test10_"+this.file.name,
+                    insertKey: this.insertKey
+                  };
+                this.ws.send(JSON.stringify(insertObject));
+            };
+            this.sendData = function(){
+                var reader = new FileReader();
+                var ws = this.ws;
+                reader.onload = function(){
+                    var buffer = reader.result;
+                    ws.send(buffer);
+                };
+                reader.readAsArrayBuffer(this.file);
+            };
+            this.send = function(){
+		this.startTime = new Date();
+		if (globalStartTime === null){
+			globalStartTime = this.startTime;
+			console.log("globalStartTime: "+globalStartTime.toTimeString());
+		}
+                this.sendMetadata();
+            };
+            this.handleReply = function(reply){
+		if (reply.type === "request" && reply.action === "senddata"){
+			console.log(this.oid+": Received Send data! Sending data.");
+			this.sendData();
+		}
+		else if (reply.type === "reply" && reply.result === "success"){
+			this.endTime = new Date();
+			console.log(this.oid+": Insert succeed! requestURI = "+reply.requestURI+" mili: "+(this.endTime - this.startTime));
+			if (globalEndTime === null || globalEndTime < this.endTime){
+				globalEndTime = this.endTime;
+				console.log("globalEndTime:"+globalEndTime.toTimeString());
+			}
+		}
+		else if (reply.type === "reply" && reply.result === "progress" && reply.event === "SplitfileProgress"){
+			console.log(this.oid+": Progress: "+reply.succeedBlocks+"/"+reply.totalBlocks);
+			if (reply.succeedBlocks === reply.totalBlocks){
+				this.endTime = new Date();
+				console.log(this.oid+": All blocks inserted! mili: "+(this.endTime - this.startTime));
+			}
+		}
+		else {
+			console.log(this.oid+": "+JSON.stringify(reply));
+            	}
+	     };
+            
+          };
+	  var ws;
+	  initWebSocket = function(){
+            if ("WebSocket" in window)
+            {
+               //alert("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               ws = new WebSocket("wss://nexcom:8889/data");
+	       ws.binaryType = 'arraybuffer';
+				
+               ws.onopen = function()
+               {
+                  // Web Socket is connected, send data using send()
+		  //ws.send('{"mid":"popototo", "action":"register","requestKey": "SSK@IWLpfq~RI0QpnodeBzcWCfsHH86K~lp~y2yPf65Xq3A,3RlSGO87S7TlP36lD4wltcVLAtKloB1zxVs6HGXcfCI,AQACAAE", "name":"test4.dev"}');
+		  //alert("Message popototo is sent...");
+
+                  /*ws.send('{"mid":"lalakoko", "action":"resolve","name":"test3.dev"}');
+                  alert("Message lalakoko is sent...");
+
+		  ws.send('{"mid":"ninipipi", "action":"resolve","name":"test4.dev"}');
+		  alert("Message ninipipi is sent...");*/
+
+		  //ws.send('{"mid":"insertmsg1", "action":"insert", "contentType": "image/vnd.microsoft.icon", "insertKey":"SSK@I-aJGT6nvSB-FHPT86RkB3-5JEXZyU37Mtd1vyPiWAM,P-1j8W6pkj-zWBfkrMJbOw1zh8cm~x6EXp1z94AjRy0,AQECAAE"}');
+		  //ws.send('{"mid":"insertmsg2", "action":"insert", "contentType": "image/vnd.microsoft.icon", "insertKey":"SSK@I-aJGT6nvSB-FHPT86RkB3-5JEXZyU37Mtd1vyPiWAM,P-1j8W6pkj-zWBfkrMJbOw1zh8cm~x6EXp1z94AjRy0,AQECAAE"}');
+		  //ws.send('{"mid": "clearmsg1", "action":"clearqueue"}');
+		  //ws.send('{"mid":"insertmsg3", "action":"insert", "contentType": "image/vnd.microsoft.icon", "filename":"test10", "insertKey":"SSK@I-aJGT6nvSB-FHPT86RkB3-5JEXZyU37Mtd1vyPiWAM,P-1j8W6pkj-zWBfkrMJbOw1zh8cm~x6EXp1z94AjRy0,AQECAAE/"}');
+
+	
+		  /*alert("Message insertmsg1 is sent...");*/
+
+		  //var buffer = new ArrayBuffer(128);
+		  //ws.send(buffer);
+		  //ws.send('{"mid":"insertmsg4", "action":"insert", "contentType": "image/vnd.microsoft.icon", "insertKey":"SSK@I-aJGT6nvSB-FHPT86RkB3-5JEXZyU37Mtd1vyPiWAM,P-1j8W6pkj-zWBfkrMJbOw1zh8cm~x6EXp1z94AjRy0,AQECAAE"}');
+		  //var buffer = new ArrayBuffer(128);
+                  //ws.send(buffer);
+
+		  /*alert("Buffer is sent...");*/
+               };
+				
+               ws.onmessage = function (evt) 
+               { 
+		  //console.log(evt.data);
+                  var reply = JSON.parse(evt.data);
+                  var refmid = reply.refmid;
+                  if (typeof refmid !== 'undefined'){
+                    var oid = refmid.split("-")[0];
+                    fileObjects[oid].handleReply(reply);
+                  }
+                  //var received_msg = evt.data;
+                  //alert("Message is received... "+received_msg);
+               };
+				
+               ws.onclose = function()
+               { 
+                  // websocket is closed.
+                  console.log("Connection is closed... Trying again.");
+		  initWebSocket();	  
+               };
+
+            }
+            
+            else
+            {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+	    }
+            
+            insertFiles = function(){
+                var fileSelect = document.getElementById('filesToUpload');
+                var files = fileSelect.files;
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var oid ="if"+i;
+                    fileObjects[oid] = new InsertFile(ws, oid, file, "SSK@I-aJGT6nvSB-FHPT86RkB3-5JEXZyU37Mtd1vyPiWAM,P-1j8W6pkj-zWBfkrMJbOw1zh8cm~x6EXp1z94AjRy0,AQECAAE/");
+                    fileObjects[oid].send();
+                }
+            }
+
+	    initWebSocket();   
+      </script>
+		
+   </head>
+   <body>
+   
+      <div id="sse">
+         <a href="javascript:WebSocketTest()">Run WebSocket</a>
+      </div>
+       <form method="post" enctype="multipart/form-data">
+            <input name="filesToUpload[]" id="filesToUpload" type="file" multiple="" />
+            <button onclick="insertFiles(); return false;">Insert</button>
+       </form>
+   </body>
+</html>

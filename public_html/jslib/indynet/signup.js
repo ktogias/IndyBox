@@ -1,4 +1,4 @@
-/* global Indynet, CryptoJS, TwinBcrypt */
+/* global Indynet, CryptoJS, TwinBcrypt, forge, sodium */
 
 if (typeof Indynet !== undefined){
     if (typeof Indynet.Signup !== undefined){
@@ -43,6 +43,28 @@ if (typeof Indynet !== undefined){
                 return this.possibleSignupResults.OK;
             };
         };
+        
+        forge.random.getBytes(128, function(err, salt){
+            console.log(btoa(salt));
+            var str_salt = "fP+mxClEge+XxBG/Whinwhzj1ePTHg0A/rg7ym57gDVWfaJmU87lrHcgpQjal1buCJgSzXD2ffcDevqUpYYDj7qwHYElgVuSY/Xt1PGEjCL2/7VPTbV6gbmG6nhXbZV5xNAzTN+UkP7kH/CK6FMBf8fLBA5UOnrEXW+ojYiY9IM=";
+            forge.pkcs5.pbkdf2('password', atob(str_salt), 2000, 1024, 'sha256', function(err, key){
+                console.log(btoa(key));
+            });
+            
+        });
+        
+        var rsa = forge.pki.rsa;
+        rsa.generateKeyPair({bits: 2048, workerScript: indynet.buildIndyUrl('jslib.forge/prime.worker.js'), e: 0x10001}, function(err, keypair){
+           console.log(err);
+           console.log(forge.pki.privateKeyToPem(keypair.privateKey));
+           console.log(forge.pki.publicKeyToPem(keypair.publicKey));
+        });
+        
+        //var key = forge.pkcs5.pbkdf2('password', 1000, 32);
+        //console.log(key);
+        
+        
+        
     }
     else {
         throw "Indynet.Signup initialization error! Indynet.Signup alread defined!";

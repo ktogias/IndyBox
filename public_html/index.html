@@ -24,16 +24,11 @@
       <script src="/indybox/jslib/respond/respond.min.js"></script>
     <![endif]-->
     
-    <script>
-        development_override = {
-            indynet: {
-                freenetHost: "astra",
-                freenetPort: "8888",
-                serverAppBaseUrl: "/indybox/"
-            }
-        };
-    </script>
-    <script src="/indybox/jslib/twin-bcrypt/twin-bcrypt.min.js"></script>
+    <script src="/indybox/dev.js"></script>
+    
+    <script src="/indybox/jslib/forge/prime.worker.js"></script>
+    <script src="/indybox/jslib/forge/forge-0.6.34.min.js"></script>
+    
     <script src="/indybox/jslib/cryptojs/sha3.js"></script>
     <script src="/indybox/jslib/dropbox/zxcvbn.js"></script>
     <script src="/indybox/jslib/indynet/boot.js"></script>

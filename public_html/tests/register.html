@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+
+        <script type="text/javascript">
+            var i = 0;
+            var globalStartTime = null;
+            var globalEndTime = null;
+            var wsHandlers = {};
+            var Register = function (ws, oid, requestKey, name) {
+                this.ws = ws;
+                this.oid = oid;
+                this.requestKey = requestKey;
+                this.name = name;
+                this.startTime = null;
+                this.endTime = null;
+
+                this.register = function(){
+                    var message = {
+                        mid:this.oid+"-rm",
+                        action: "register",
+                        name: this.name,
+                        requestKey: this.requestKey
+                    }
+                    this.ws.send(JSON.stringify(message));
+                };
+                this.handleReply = function (reply) {
+                    console.log(this.oid + ": " + JSON.stringify(reply));
+                };
+
+            };
+            var ws;
+            initWebSocket = function () {
+                if ("WebSocket" in window)
+                {
+                    // Let us open a web socket
+                    ws = new WebSocket("wss://nexcom:8889/key");
+                    ws.binaryType = 'arraybuffer';
+
+                    ws.onopen = function ()
+                    {
+                        console.log("Websocket opened :)");
+                    };
+
+                    ws.onmessage = function (evt)
+                    {
+                        //console.log(evt.data);
+                        var reply = JSON.parse(evt.data);
+                        var refmid = reply.refmid;
+                        if (typeof refmid !== 'undefined') {
+                            var oid = refmid.split("-")[0];
+                            wsHandlers[oid].handleReply(reply);
+                        }
+                        //var received_msg = evt.data;
+                        //alert("Message is received... "+received_msg);
+                    };
+
+                    ws.onclose = function ()
+                    {
+                        // websocket is closed.
+                        console.log("Connection is closed... Trying again.");
+                        initWebSocket();
+                    };
+
+                }
+
+                else
+                {
+                    // The browser doesn't support WebSocket
+                    alert("WebSocket NOT supported by your Browser!");
+                }
+            }
+            
+            var register = function(){
+                var requestKey = document.getElementById('requestkey').value;
+                var name = document.getElementById('name').value;
+                var oid = "reg"+i;
+                i++;
+                wsHandlers[oid] = new Register(ws, oid, requestKey, name);
+                wsHandlers[oid].register();
+            }
+
+            initWebSocket();
+        </script>
+        <title>Register</title>
+    </head>
+    <body>
+        <form method="post" enctype="multipart/form-data">
+            <p>
+                <label for="requestkey">Request key:</label> <input name="requestkey" id="requestkey" type="text"/>
+            </p>
+            <p>
+                <label for="name">Name:</label> <input name="name" id="name" type="text"/>
+            </p>
+            <button onclick="register(); return false;">Register</button>
+        </form>
+    </body>
+</html>
